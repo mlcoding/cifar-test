@@ -21,7 +21,7 @@ from torch.autograd import Variable
 
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="2"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 start = time.time()
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -37,16 +37,16 @@ start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 # Data
 print('==> Preparing data..')
 transform_train = transforms.Compose([
-                                      transforms.RandomCrop(32, padding=4),
-                                      transforms.RandomHorizontalFlip(),
-                                      transforms.ToTensor(),
-                                      transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-                                      ])
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
 
 transform_test = transforms.Compose([
-                                     transforms.ToTensor(),
-                                     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-                                     ])
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=0)
@@ -69,16 +69,16 @@ else:
     print('==> Building model..')
     # net = VGG('VGG19')
     net = VGG_sphere('VGG19')
-# net = ResNet18()
-# net = PreActResNet18()
-# net = GoogLeNet()
-# net = DenseNet121()
-# net = ResNeXt29_2x64d()
-# net = MobileNet()
-# net = MobileNetV2()
-# net = DPN92()
-# net = ShuffleNetG2()
-# net = SENet18()
+    # net = ResNet18()
+    # net = PreActResNet18()
+    # net = GoogLeNet()
+    # net = DenseNet121()
+    # net = ResNeXt29_2x64d()
+    # net = MobileNet()
+    # net = MobileNetV2()
+    # net = DPN92()
+    # net = ShuffleNetG2()
+    # net = SENet18()
 
 if use_cuda:
     net.cuda()
@@ -103,16 +103,16 @@ def train(epoch):
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
-        
+
         train_loss += loss.data[0]
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
-    correct += predicted.eq(targets.data).cpu().sum()
-#progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-#    % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+        correct += predicted.eq(targets.data).cpu().sum()
+        #progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+        #    % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
-if epoch % 20 == 0 and epoch != 0:
-    print('Epoch: %d' % epoch)
+    if epoch % 20 == 0 and epoch != 0:
+        print('Epoch: %d' % epoch)
         print('++++tr_iteration_%d: Loss: %.3f | Acc: %.3f%% (%d/%d)'
               % (epoch, train_loss/(batch_idx+1), 100.*correct/total, correct, total))
     return train_loss/(batch_idx+1), correct, total
@@ -129,20 +129,20 @@ def test(epoch):
         inputs, targets = Variable(inputs, volatile=True), Variable(targets)
         outputs = net(inputs)
         loss = criterion(outputs, targets)
-        
+
         test_loss += loss.data[0]
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
-    correct += predicted.eq(targets.data).cpu().sum()
+        correct += predicted.eq(targets.data).cpu().sum()
 
-# progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-#    % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+        # progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+        #    % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
-if epoch % 20 == 0 and epoch != 0:
-    print('----ts_iteration_%d: Loss: %.3f | Acc: %.3f%% (%d/%d)'
-          % (epoch, test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+    if epoch % 20 == 0 and epoch != 0:
+        print('----ts_iteration_%d: Loss: %.3f | Acc: %.3f%% (%d/%d)'
+            % (epoch, test_loss/(batch_idx+1), 100.*correct/total, correct, total))
         print('time: %.1f sec' % (time.time()-start))
-          return test_loss/(batch_idx+1), correct, total
+    return test_loss/(batch_idx+1), correct, total
 
 
 max_epoch = 1000
