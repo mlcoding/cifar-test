@@ -160,10 +160,10 @@ for epoch in range(start_epoch, start_epoch+max_epoch):
     tr_loss[epoch], tr_correct[epoch], tr_total = train(epoch)
     ts_loss[epoch], ts_correct[epoch], ts_total =test(epoch)
 
-# Save checkpoint.
+# Save results.
 print('Saving..')
 state = {
-    'net': net.module if use_cuda else net,
+    #'net': net.module if use_cuda else net,
     'tr_loss': tr_loss,
     'ts_loss': ts_loss,
     'tr_correct': tr_correct,
@@ -171,6 +171,6 @@ state = {
     'tr_total': tr_total,
     'ts_total': ts_total,
 }
-if not os.path.isdir('checkpoint'):
-    os.mkdir('checkpoint')
-# torch.save(state, './checkpoint/ckpt_v1_1.t7')
+# if not os.path.isdir('checkpoint'):
+#     os.mkdir('checkpoint')
+torch.save('./results/vgg_v2.npy',state)
