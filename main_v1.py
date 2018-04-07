@@ -7,6 +7,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
 import numpy as np
+import time as time
 
 import torchvision
 import torchvision.transforms as transforms
@@ -22,6 +23,7 @@ from torch.autograd import Variable
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
+start = time.time()
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
@@ -65,6 +67,7 @@ if args.resume:
     start_epoch = checkpoint['epoch']
 else:
     print('==> Building model..')
+    # net = VGG('VGG19')
     net = VGG('VGG19')
     # net = ResNet18()
     # net = PreActResNet18()
@@ -138,6 +141,7 @@ def test(epoch):
     if epoch % 20 == 0 and epoch != 0:
         print('----ts_iteration_%d: Loss: %.3f | Acc: %.3f%% (%d/%d)'
             % (epoch, test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+        print('time: %.1f sec' % (time.time()-start))
     return test_loss/(batch_idx+1), correct, total
 
 
@@ -169,4 +173,4 @@ state = {
 }
 if not os.path.isdir('checkpoint'):
     os.mkdir('checkpoint')
-torch.save(state, './checkpoint/ckpt_v1_1.t7')
+# torch.save(state, './checkpoint/ckpt_v1_1.t7')
