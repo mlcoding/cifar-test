@@ -155,7 +155,7 @@ def test(epoch):
     return test_loss/(batch_idx+1), correct, total
 
 
-max_epoch = 10
+max_epoch = 1000
 tr_loss = np.zeros(max_epoch)
 ts_loss = np.zeros(max_epoch)
 tr_correct = np.zeros(max_epoch)
