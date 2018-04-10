@@ -33,7 +33,7 @@ for ite in range(5):
     use_cuda = torch.cuda.is_available()
     print(use_cuda)
     best_acc = 0  # best test accuracy
-    # start_epoch = 0  # start from epoch 0 or last checkpoint epoch
+    start_epoch = 0  # start from epoch 0 or last checkpoint epoch
     # Data
     print('==> Preparing data..')
     transform_train = transforms.Compose([
