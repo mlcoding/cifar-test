@@ -169,7 +169,7 @@ for ite in range(5):
         'tr_total': tr_total,
         'ts_total': ts_total,
     }
-    # if not os.path.isdir('checkpoint'):
-    #     os.mkdir('checkpoint')
-    torch.save('./results/vgg_result_'+str(ite)+'.npy',state)
-    torch.save('./results/vgg_net_'+str(ite)+'.npy',net)
+    if not os.path.isdir('results'):
+        os.mkdir('results')
+    torch.save(state, './results/vgg_result_'+str(ite)+'.npy')
+    torch.save(net,'./results/vgg_net_'+str(ite)+'.npy')
