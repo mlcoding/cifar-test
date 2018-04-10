@@ -173,4 +173,5 @@ state = {
 }
 # if not os.path.isdir('checkpoint'):
 #     os.mkdir('checkpoint')
-torch.save('./results/vgg_v2.npy',state)
+torch.save('./results/vgg1_result_.npy',state)
+torch.save('./results/vgg1_net_.npy',net)
