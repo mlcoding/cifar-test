@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from SphereConv import Sphere_Conv2d
+from ..SphereConv import Sphere_Conv2d
 
 
 cfg = {
