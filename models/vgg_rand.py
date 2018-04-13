@@ -23,20 +23,35 @@ class rand_activation(nn.Module):
     def __init__(self, out_size, input_size, seed):
         super(rand_activation, self).__init__()
         torch.manual_seed(seed)
-        self.R = torch.randn(out_size,input_size)
-#        print('\nSize of R')
-#        print(self.R.size())
+        self.R = torch.randn(out_size,input_size)       
+        if torch.cuda.is_available():
+            self.R = self.R.cuda()
+            
+        self.input_size = input_size
+#        print('Size of R',self.R.size())
         
     def forward(self, x, input_data):
 #        print('\nInside rand_activation:\n')
-        input_size = input_data.numel()       
-        S = torch.matmul(self.R,input_data.data.resize_(input_size))  # torch.mv? 
-        S = torch.clamp(S,min=0)
+        batch_size = int(input_data.numel()/self.input_size) 
+#        print(batch_size,list(self.R.shape)[0],list(self.R.shape)[1])
         
-        S = S.expand(list(x.shape)[0],list(x.shape)[2],list(x.shape)[3],
-                     list(S.shape)[0]).permute(0,3,1,2)        
-#        print('Size of features: ', x.shape)
+        R_exp = self.R.expand(batch_size,list(self.R.shape)[0],list(self.R.shape)[1])
+        
+#        print('Shape of appended R: ', R_expshape)
+#        print('Shape of input_data: ', input_data.data.shape)
+#        print('Input size: ', self.input_size)
+        
+        # Batch multiply the random matrix over the entire mini-batch
+        S = torch.bmm(R_exp,input_data.data.view(-1,self.input_size).unsqueeze(2))
+        S.squeeze_(2)
+        
+        S = torch.clamp(S,min=0)
 #        print('Size of S: ', S.shape)
+#        print('Shape of x (features): ', x.shape)
+        
+        S = S.expand(list(x.shape)[2],list(x.shape)[3],-1,-1).permute(2,3,0,1)        
+        
+#        print('Shape of expanded S: ', S.shape)
         
         return Variable(S*x.data, requires_grad=True)
 
@@ -125,64 +140,78 @@ class VGG_rand(nn.Module):
         
     def forward(self, x):        
         out = x
-
+#        print('Inside the forward pass')
         # Layer 1
         out = self.conv1(out)
         out = self.bn1(out)        
         out = self.activation1(out,x)
+#        print('Layer 1 done')
         
         # Layer 2 
         out = self.MaxPool2(out)
+#        print('Layer 2 done')
         
         # Layer 3
         out = self.conv3(out)
         out = self.bn3(out)        
         out = self.activation3(out,x)
+#        print('Layer 3 done')
         
         # Layer 4
         out = self.MaxPool4(out)
+#        print('Layer 4 done')
         
         # Layer 5
         out = self.conv5(out)
         out = self.bn5(out)        
         out = self.activation5(out,x)
+#        print('Layer 5 done')
         
         # Layer 6
         out = self.conv6(out)
         out = self.bn6(out)        
         out = self.activation6(out,x)
+#        print('Layer 6 done')
         
         # Layer 7
         out = self.MaxPool7(out)
+#        print('Layer 7 done')
         
         # Layer 8
         out = self.conv8(out)
         out = self.bn8(out)        
         out = self.activation8(out,x)
+#        print('Layer 8 done')
         
         # Layer 9
         out = self.conv9(out)
         out = self.bn9(out)        
         out = self.activation9(out,x)
+#        print('Layer 9 done')
         
         # Layer 10
         out = self.MaxPool10(out)
+#        print('Layer 10 done')
         
         # Layer 11
         out = self.conv11(out)
         out = self.bn11(out)        
         out = self.activation11(out,x)
+#        print('Layer 11 done')
         
         # Layer 12
         out = self.conv12(out)
         out = self.bn12(out)        
         out = self.activation12(out,x)
+#        print('Layer 12 done')
         
         # Layer 13 
         out = self.MaxPool13(out)
+#        print('Layer 13 done')
         
         # Last Layer        
         out = self.AvgPool2d(out)
+#        print('Layer 14 done')
         
         out = out.view(out.size(0), -1)        
         out = self.classifier(out)

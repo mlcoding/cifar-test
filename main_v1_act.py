@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import torchvision
 import torchvision.transforms as transforms
 
+import time
+
 import os
 import argparse
 
@@ -21,7 +23,7 @@ from torch.autograd import Variable
 
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="2"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -29,9 +31,11 @@ parser.add_argument('--resume', '-r', action='store_true', help='resume from che
 args = parser.parse_args()
 
 use_cuda = torch.cuda.is_available()
+#use_cuda = False
 print(use_cuda)
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
+batch = 128
 
 # Data
 print('==> Preparing data..')
@@ -49,13 +53,15 @@ transform_test = transforms.Compose([
 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)
 # Reduce the dataset size (only for debugging)
-#trainset.train_data = trainset.train_data[0:1000]   
+# trainset.train_data = trainset.train_data[0:8000]
 
 #trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=0)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=1, shuffle=True, num_workers=0)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch, shuffle=True, num_workers=0)
 
 testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
-testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=0)
+# testset.test_data = testset.test_data[0:1000]
+
+testloader = torch.utils.data.DataLoader(testset, batch_size=batch, shuffle=False, num_workers=0)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
@@ -154,8 +160,8 @@ def test(epoch):
             % (epoch, test_loss/(batch_idx+1), 100.*correct/total, correct, total))
     return test_loss/(batch_idx+1), correct, total
 
-
-max_epoch = 1000
+start_time = time.time()
+max_epoch = 500
 tr_loss = np.zeros(max_epoch)
 ts_loss = np.zeros(max_epoch)
 tr_correct = np.zeros(max_epoch)
@@ -171,6 +177,9 @@ for epoch in range(start_epoch, start_epoch+max_epoch):
     tr_loss[epoch], tr_correct[epoch], tr_total = train(epoch)
     ts_loss[epoch], ts_correct[epoch], ts_total = test(epoch)
 
+total_time = time.time() - start_time
+print("--- %s seconds per epoch ---" % (total_time/max_epoch))
+
 # Save checkpoint.
 print('Saving..')
 state = {
@@ -181,10 +190,11 @@ state = {
     'ts_correct': ts_correct,
     'tr_total': tr_total,
     'ts_total': ts_total,
+    'epoch_time': total_time/max_epoch,
 }
 
-if not os.path.isdir('checkpoint'):
-    os.mkdir('checkpoint')
+if not os.path.isdir('results'):
+    os.mkdir('results')
     
 # change the name for VGG vs VGG_rand    
-torch.save('./results/vggrans_result.npy',state)
+torch.save(state, './results/vgg_result_act.npy')
