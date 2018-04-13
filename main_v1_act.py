@@ -127,7 +127,7 @@ def train(epoch):
         #progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
         #    % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
     
-    print('Epoch %d: done ' % epoch)
+    # print('Epoch %d: done ' % epoch)
     if epoch % 20 == 0 and epoch != 0:
         
         print('++++tr_iteration_%d: Loss: %.3f | Acc: %.3f%% (%d/%d)'
@@ -170,8 +170,8 @@ tr_total = 0
 ts_total = 0
 lr = args.lr
 for epoch in range(start_epoch, start_epoch+max_epoch):
-    print('epoch %d started' %(epoch))
-    if epoch%200 == 0 and epoch!=0:
+    # print('epoch %d started' %(epoch))
+    if epoch%100 == 0 and epoch!=0:
         lr = lr/4
         optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
     tr_loss[epoch], tr_correct[epoch], tr_total = train(epoch)
