@@ -1,5 +1,6 @@
 from vgg import *
 from vgg_rand import *
+from vgg_check import *
 from dpn import *
 from lenet import *
 from senet import *
