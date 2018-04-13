@@ -76,10 +76,10 @@ if args.resume:
     start_epoch = checkpoint['epoch']
 else:
     print('==> Building model..')
-    net = VGG('VGG11')
+#    net = VGG('VGG11')
     
-    # input_size = trainset.train_data[0].size
-    # net = VGG_rand('VGG11',input_size)
+    input_size = trainset.train_data[0].size
+    net = VGG_rand('VGG11',input_size)
     
     # net = ResNet18()
     # net = PreActResNet18()
@@ -197,6 +197,4 @@ if not os.path.isdir('results'):
     os.mkdir('results')
     
 # change the name for VGG vs VGG_rand    
-torch.save(state, './results/vgg_result_act1.npy')
-# vgg_result_act1: without rand act
-# vgg_result_act: with rand act
+torch.save(state, './results/vgg_result_act.npy')
