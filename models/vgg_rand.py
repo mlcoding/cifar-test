@@ -28,18 +28,31 @@ class rand_activation(nn.Module):
             self.R = self.R.cuda()
             
         self.input_size = input_size
+#        print('Size of R',self.R.size())
         
     def forward(self, x, input_data):
-        batch_size = int(input_data.numel()/self.input_size)
+#        print('\nInside rand_activation:\n')
+        batch_size = input_data.numel()/self.input_size 
+#        print(batch_size,list(self.R.shape)[0],list(self.R.shape)[1])
         
-        R_exp = self.R.expand(batch_size,list(self.R.shape)[0],list(self.R.shape)[1])
+        R_exp = self.R.expand(batch_size,-1,-1)
+        
+#        print('Shape of appended R: ', R_expshape)
+#        print('Shape of input_data: ', input_data.data.shape)
+#        print('Input size: ', self.input_size)
         
         # Batch multiply the random matrix over the entire mini-batch
         S = torch.bmm(R_exp,input_data.data.view(-1,self.input_size).unsqueeze(2))
         S.squeeze_(2)
         
-        S = torch.clamp(S,min=0)
-        S = S.expand(list(x.shape)[2],list(x.shape)[3],-1,-1).permute(2,3,0,1)
+#        S = torch.clamp(S,min=0)
+        S = (S>0).float()
+#        print('Size of S: ', S.shape)
+#        print('Shape of x (features): ', x.shape)
+        
+        S = S.expand(list(x.shape)[2],list(x.shape)[3],-1,-1).permute(2,3,0,1)        
+        
+#        print('Shape of expanded S: ', S.shape)
         
         return Variable(S*x.data, requires_grad=True)
 
@@ -126,6 +139,9 @@ class VGG_rand(nn.Module):
 #        self.classifier = nn.Linear(32768, 10)
         self.classifier = nn.Linear(512, 10)
         
+        self.ReLU11 = nn.ReLU(inplace=True)
+        self.ReLU12 = nn.ReLU(inplace=True)
+        
     def forward(self, x):        
         out = x
 #        print('Inside the forward pass')
@@ -184,13 +200,13 @@ class VGG_rand(nn.Module):
         # Layer 11
         out = self.conv11(out)
         out = self.bn11(out)        
-        out = self.activation11(out,x)
+        out = self.ReLU11(out,x)
 #        print('Layer 11 done')
         
         # Layer 12
         out = self.conv12(out)
         out = self.bn12(out)        
-        out = self.activation12(out,x)
+        out = self.ReLU12(out,x)
 #        print('Layer 12 done')
         
         # Layer 13 
