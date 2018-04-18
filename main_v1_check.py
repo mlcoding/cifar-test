@@ -23,7 +23,7 @@ from torch.autograd import Variable
 
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -64,6 +64,7 @@ testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True
 testloader = torch.utils.data.DataLoader(testset, batch_size=batch, shuffle=False, num_workers=0)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+print('--> Original VGG11')
 
 # Model
 if args.resume:
@@ -76,10 +77,10 @@ if args.resume:
     start_epoch = checkpoint['epoch']
 else:
     print('==> Building model..')
-#    net = VGG('VGG11')
+    net = VGG('VGG11')
     
-    input_size = trainset.train_data[0].size
-    net = VGG_check('VGG11',input_size)
+# input_size = trainset.train_data[0].size
+# net = VGG_check('VGG11',input_size)
     
     # net = ResNet18()
     # net = PreActResNet18()
@@ -196,5 +197,6 @@ state = {
 if not os.path.isdir('results'):
     os.mkdir('results')
     
-# change the name for VGG vs VGG_rand    
-torch.save(state, './results/vgg_result_check.npy')
+# change the name for VGG vs VGG_rand
+torch.save(state, './results/vgg11_result_0.npy')
+torch.save(net,'./results/vgg11_net_0.npy')
