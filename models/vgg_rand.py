@@ -200,13 +200,13 @@ class VGG_rand(nn.Module):
         # Layer 11
         out = self.conv11(out)
         out = self.bn11(out)        
-        out = self.activation11(out)
+        out = self.activation11(out,x)
 #        print('Layer 11 done')
         
         # Layer 12
         out = self.conv12(out)
         out = self.bn12(out)        
-        out = self.activation12(out)
+        out = self.activation12(out,x)
 #        print('Layer 12 done')
         
         # Layer 13 
