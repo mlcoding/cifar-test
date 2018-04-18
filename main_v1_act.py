@@ -197,7 +197,8 @@ if not os.path.isdir('results'):
     os.mkdir('results')
     
 # change the name for VGG vs VGG_rand    
-torch.save(state, './results/vgg_result_act2.npy')
+torch.save(state, './results/vgg_result_act_0.npy')
+torch.save(net,'./results/vgg_net_act_0.npy')
 # vgg_result_act1: without rand act
 # vgg_result_act: with rand act
 # vgg_result_act2: with rand act5
